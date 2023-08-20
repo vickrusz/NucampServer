@@ -22,6 +22,10 @@ const partnerSchema = newSchema({
         type: String,
         required: true
     },
+}, {
+    timestamps: true
 })
+
+const Partner = mongoose.model('partner', partnerSchema);
 
 module.exports = Partner;

@@ -6,13 +6,14 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+
 const campsiteRouter = require('./routes/campsiteRouter');
 const promotionRouter = require('./routes/promotionRouter');
 const partnerRouter = require('./routes/partnerRouter');
 
 const mongoose = require('mongoose');
 
-const url = 'mongodb://127.0.0.1:27017/nucampsite'
+const url = 'mongodb+srv://vickrusz:jmz9l7QdJZ6S9Qcs@nucamp.yblijjj.mongodb.net//nucampsite'
 const connect = mongoose.connect(url, {
   useCreateIndex: true,
   useFindAndModify: false,
