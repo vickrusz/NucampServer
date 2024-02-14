@@ -13,7 +13,7 @@ const partnerRouter = require('./routes/partnerRouter');
 
 const mongoose = require('mongoose');
 
-const url = 'mongodb+srv://vickrusz:jmz9l7QdJZ6S9Qcs@nucamp.yblijjj.mongodb.net//nucampsite'
+const url = 'mongodb://localhost:27017/nucampsite'
 const connect = mongoose.connect(url, {
   useCreateIndex: true,
   useFindAndModify: false,
@@ -50,7 +50,7 @@ function auth(req, res, next) {
     const user = auth[0];
     const pass = auth[1];
     if (user === 'admin' && pass === 'password') {
-      return next();
+      return next(); 
     } else {
       const err = new Error('You are not authenticated!');
       res.setHeader('WWW-Authenticate', 'Basic');
