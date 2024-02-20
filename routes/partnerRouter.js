@@ -13,7 +13,7 @@ partnerRouter.route('/')
     })
     .catch(err => next(err));
 })
-.post((req, res, next) => {
+.post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Partner.create(req.body)
     .then(partner => {
         console.log('Partner Created ', partner);
@@ -23,11 +23,11 @@ partnerRouter.route('/')
     })
     .catch(err => next(err));
 })
-.put((req, res) => {
+.put(authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end(`Will add the partners: ${req.body.name} with description: ${req.body.description}`);
 })
-.delete((req, res) => {
+.delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {
     Partner.deleteMany()
     .then(response => {
         res.statusCode = 200;
@@ -47,10 +47,10 @@ partnerRouter.route('/:partnerId')
     })
     .catch(err => next(err)); 
 })
-.post((req, res) => {
+.post(authenticate.verifyUser,(req, res) => {
     res.end(`Will add the partners: ${req.body.name} with description: ${req.body.description}`);
 })
-.put((req, res) => {
+.put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {
     Partner.findByIdAndUpdate(req.params.partnerId, {
         $set: req.body
     }, { new: true})
@@ -61,7 +61,7 @@ partnerRouter.route('/:partnerId')
     })
     .catch(err => next(err)); 
 })
-.delete((req, res) => {
+.delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {
     Partner.findByIdAndDelete(req.params.partnerId)
     .then(response => {
         res.statusCode = 200;
