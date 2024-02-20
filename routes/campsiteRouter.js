@@ -175,55 +175,74 @@ campsiteRouter.route('/:campsiteId/comments/:commentId')
 })
 .put(authenticate.verifyUser, (req, res, next) => {
     Campsite.findById(req.params.campsiteId)
-    .then(campsite => {
+      .then((campsite) => {
         if (campsite && campsite.comments.id(req.params.commentId)) {
+          const comment = campsite.comments.id(req.params.commentId);
+          if (comment.author.equals(req.user._id)) {
+            //Here's where we add the additional check for the current user!!
             if (req.body.rating) {
-                campsite.comments.id(req.params.commentId).rating = req.body.rating;
+              comment.rating = req.body.rating;
             }
             if (req.body.text) {
-                campsite.comments.id(req.params.commentId).text = req.body.text;
-            } 
-            campsite.save()
-            .then(campsite => {
+              comment.text = req.body.text;
+            }
+            campsite
+              .save()
+              .then((campsite) => {
                 res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
+                res.setHeader("Content-Type", "application/json");
                 res.json(campsite);
-            })
-            .catch(err => next(err));
+              })
+              .catch((err) => next(err));
+          } else {
+            err = new Error("You are not authorized to edit this comment!");
+            err.status = 403; // Forbidden
+            return next(err);
+          }
         } else if (!campsite) {
-            err = new Error(`Campsite ${req.params.campsiteId} not found`);
-            err.status = 404;
-            return next(err);
+          err = new Error(`Campsite ${req.params.campsiteId} not found`);
+          err.status = 404;
+          return next(err);
         } else {
-            err = new Error(`Comment ${req.params.commentId} not found`);
-            err.status = 404;
-            return next(err);
+          err = new Error(`Comment ${req.params.commentId} not found`);
+          err.status = 404;
+          return next(err);
         }
-    })
-})
-.delete(authenticate.verifyUser, (req, res, next) => {
+      })
+      .catch((err) => next(err));
+  })
+  .delete(authenticate.verifyUser, (req, res, next) => {
     Campsite.findById(req.params.campsiteId)
-    .then(campsite => {
+      .then((campsite) => {
         if (campsite && campsite.comments.id(req.params.commentId)) {
-            campsite.comments.id(req.params.commentId).remove();
-            campsite.save()
-            .then(campsite => {
+          const comment = campsite.comments.id(req.params.commentId);
+          if (comment.author.equals(req.user._id)) {
+            // comment's author matches current user?
+            comment.remove();
+            campsite
+              .save()
+              .then((campsite) => {
                 res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
+                res.setHeader("Content-Type", "application/json");
                 res.json(campsite);
-            })
-            .catch(err => next(err));
+              })
+              .catch((err) => next(err));
+          } else {
+            err = new Error("You are not authorized to delete this comment!");
+            err.status = 403;
+            return next(err);
+          }
         } else if (!campsite) {
-            err = new Error(`Campsite ${req.params.campsiteId} not found`);
-            err.status = 404;
-            return next(err);
+          err = new Error(`Campsite ${req.params.campsiteId} not found`);
+          err.status = 404;
+          return next(err);
         } else {
-            err = new Error(`Comment ${req.params.commentId} not found`);
-            err.status = 404;
-            return next(err);
+          err = new Error(`Comment ${req.params.commentId} not found`);
+          err.status = 404;
+          return next(err);
         }
-    })
-    .catch(err => next(err));
-});
+      })
+      .catch((err) => next(err));
+  });
 
 module.exports = campsiteRouter;
